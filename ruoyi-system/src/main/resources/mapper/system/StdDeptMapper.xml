@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StdDeptMapper">
+    
+    <resultMap type="StdDept" id="StdDeptResult">
+        <result property="deptId"    column="dept_id"    />
+        
+        <result property="stdHouseId"    column="std_house_id"    />
+        <result property="deptNature"    column="dept_nature"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="police"    column="police"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="legalRepresentativeIdType"    column="legal_representative_id_type"    />
+        <result property="legalRepresentativeId"    column="legal_representative_id"    />
+        <result property="legalRepresentativeName"    column="legal_representative_name"    />
+        <result property="legalRepresentativeContacts"    column="legal_representative_contacts"    />
+        <result property="leaderIdType"    column="leader_id_type"    />
+        <result property="leaderId"    column="leader_id"    />
+        <result property="leaderName"    column="leader_name"    />
+        <result property="leaderContacts"    column="leader_contacts"    />
+        <result property="securityRepresentativeIdType"    column="security_representative_id_type"    />
+        <result property="securityRepresentativeId"    column="security_representative_id"    />
+        <result property="securityRepresentativeName"    column="security_representative_name"    />
+        <result property="securityRepresentativeContacts"    column="security_representative_contacts"    />
+        <result property="fireControllerName"    column="fire_controller_name"    />
+        <result property="fireControllerContacts"    column="fire_controller_contacts"    />
+
+        <result property="provinceCode"  column="province_code"    />
+        <result property="cityCode"  column="city_code"    />
+        <result property="districtCode"  column="district_code"    />
+        <result property="streetCode"  column="street_code"    />
+        <result property="stdAddress" column="standard_address" />
+        <result property="positionCode"    column="position_code"    />
+        <result property="peopleNum"      column="people_num"        />
+
+        <collection       property="deptTypeDetails"      javaType="java.util.List"          resultMap="DeptTypeDetailsResult"/>
+    </resultMap>
+
+    <resultMap id="DeptTypeDetailsResult" type="StdDeptTypeDetails">
+        <id property="detailId"    column="detail_id"    />
+        <result property="deptType"    column="dept_type"    />
+        <result property="businessStatus"    column="business_status"    />
+        <result property="businessProject"    column="business_project"    />
+        <result property="viceProject"    column="vice_project"    />
+        <result property="rating"    column="rating"    />
+        <result property="area"    column="area"    />
+        <result property="policeRepresentativeId"    column="police_representative_id"    />
+        <result property="policeRepresentativeName"    column="police_representative_name"    />
+    </resultMap>
+
+    <sql id="selectStdDeptVo">
+        select d.dept_id, std_house_id, dept_nature, dept_name, d.police, del_flag, legal_representative_id_type, legal_representative_id, legal_representative_name, legal_representative_contacts, leader_id_type, leader_id, leader_name, leader_contacts, security_representative_id_type, security_representative_id, security_representative_name, security_representative_contacts, fire_controller_name, fire_controller_contacts, people_num, 
+        dtd.detail_id, dtd.dept_type, dtd.business_status, dtd.business_project, dtd.vice_project, dtd.rating, dtd.area, dtd.police_representative_id, dtd.police_representative_name,
+        h.standard_address, 
+        r.forefathers, r.code
+        from std_dept d
+            left join std_dept_type_details dtd on d.dept_id = dtd.dept_id
+            left join std_house h on h.house_id = d.std_house_id
+            left join gs_region r on h.position_code = r.code
+    </sql>
+
+    <select id="selectStdDeptList" parameterType="StdDept" resultMap="StdDeptResult">
+        <include refid="selectStdDeptVo"/>
+        <where>  
+            <if test="deptId != null"> and d.dept_id = #{deptId} </if>
+            <if test="stdHouseId != null "> and std_house_id = #{stdHouseId}</if>
+            <if test="cityCode == null and provinceCode != null"> and r.forefathers like concat ('0,', #{provinceCode}, ',%') </if>
+            <if test="districtCode == null and cityCode != null"> and r.forefathers like concat ('%,', #{cityCode}, ',%') </if>
+            <if test="streetCode == null and districtCode != null"> and r.forefathers like concat ('%,', #{districtCode}, ',%') </if>
+            <if test="positionCode == null and streetCode != null"> and r.forefathers like concat ('%,', #{streetCode}) </if>
+            <if test="positionCode != null "> and r.code = #{positionCode}</if>
+            <if test="deptNature != null  and deptNature != ''"> and dept_nature = #{deptNature}</if>
+            <if test="deptName != null  and deptName != ''"> and dept_name like concat('%', #{deptName}, '%')</if>
+            <if test="police != null  and police != ''"> and d.police = #{police}</if>
+            <if test="legalRepresentativeIdType != null  and legalRepresentativeIdType != ''"> and legal_representative_id_type = #{legalRepresentativeIdType}</if>
+            <if test="legalRepresentativeId != null  and legalRepresentativeId != ''"> and legal_representative_id = #{legalRepresentativeId}</if>
+            <if test="legalRepresentativeName != null  and legalRepresentativeName != ''"> and legal_representative_name like concat('%', #{legalRepresentativeName}, '%')</if>
+            <if test="legalRepresentativeContacts != null  and legalRepresentativeContacts != ''"> and legal_representative_contacts = #{legalRepresentativeContacts}</if>
+            <if test="leaderIdType != null  and leaderIdType != ''"> and leader_id_type = #{leaderIdType}</if>
+            <if test="leaderId != null  and leaderId != ''"> and leader_id = #{leaderId}</if>
+            <if test="leaderName != null  and leaderName != ''"> and leader_name like concat('%', #{leaderName}, '%')</if>
+            <if test="leaderContacts != null  and leaderContacts != ''"> and leader_contacts = #{leaderContacts}</if>
+            <if test="securityRepresentativeIdType != null  and securityRepresentativeIdType != ''"> and security_representative_id_type = #{securityRepresentativeIdType}</if>
+            <if test="securityRepresentativeId != null  and securityRepresentativeId != ''"> and security_representative_id = #{securityRepresentativeId}</if>
+            <if test="securityRepresentativeName != null  and securityRepresentativeName != ''"> and security_representative_name like concat('%', #{securityRepresentativeName}, '%')</if>
+            <if test="securityRepresentativeContacts != null  and securityRepresentativeContacts != ''"> and security_representative_contacts = #{securityRepresentativeContacts}</if>
+            <if test="fireControllerName != null  and fireControllerName != ''"> and fire_controller_name like concat('%', #{fireControllerName}, '%')</if>
+            <if test="fireControllerContacts != null  and fireControllerContacts != ''"> and fire_controller_contacts = #{fireControllerContacts}</if>
+
+            <if test="deptTypes != null"> and dtd.dept_type in 
+                <foreach item="deptTypes" collection="deptTypes" open="(" separator="," close=")">
+                    #{deptTypes}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    
+    <select id="selectStdDeptByDeptId" parameterType="Long" resultMap="StdDeptResult">
+        <include refid="selectStdDeptVo"/>
+        where d.dept_id = #{deptId}
+    </select>
+        
+    <insert id="insertStdDept" parameterType="StdDept" useGeneratedKeys="true" keyProperty="deptId">
+        insert into std_dept
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">dept_id,</if>
+            <if test="stdHouseId != null">std_house_id,</if>
+            <if test="deptNature != null">dept_nature,</if>
+            <if test="deptName != null">dept_name,</if>
+            <if test="police != null">police,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="legalRepresentativeIdType != null">legal_representative_id_type,</if>
+            <if test="legalRepresentativeId != null">legal_representative_id,</if>
+            <if test="legalRepresentativeName != null">legal_representative_name,</if>
+            <if test="legalRepresentativeContacts != null">legal_representative_contacts,</if>
+            <if test="leaderIdType != null">leader_id_type,</if>
+            <if test="leaderId != null">leader_id,</if>
+            <if test="leaderName != null">leader_name,</if>
+            <if test="leaderContacts != null">leader_contacts,</if>
+            <if test="securityRepresentativeIdType != null">security_representative_id_type,</if>
+            <if test="securityRepresentativeId != null">security_representative_id,</if>
+            <if test="securityRepresentativeName != null">security_representative_name,</if>
+            <if test="securityRepresentativeContacts != null">security_representative_contacts,</if>
+            <if test="fireControllerName != null">fire_controller_name,</if>
+            <if test="fireControllerContacts != null">fire_controller_contacts,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">#{deptId},</if>
+            <if test="stdHouseId != null">#{stdHouseId},</if>
+            <if test="deptNature != null">#{deptNature},</if>
+            <if test="deptName != null">#{deptName},</if>
+            <if test="police != null">#{police},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="legalRepresentativeIdType != null">#{legalRepresentativeIdType},</if>
+            <if test="legalRepresentativeId != null">#{legalRepresentativeId},</if>
+            <if test="legalRepresentativeName != null">#{legalRepresentativeName},</if>
+            <if test="legalRepresentativeContacts != null">#{legalRepresentativeContacts},</if>
+            <if test="leaderIdType != null">#{leaderIdType},</if>
+            <if test="leaderId != null">#{leaderId},</if>
+            <if test="leaderName != null">#{leaderName},</if>
+            <if test="leaderContacts != null">#{leaderContacts},</if>
+            <if test="securityRepresentativeIdType != null">#{securityRepresentativeIdType},</if>
+            <if test="securityRepresentativeId != null">#{securityRepresentativeId},</if>
+            <if test="securityRepresentativeName != null">#{securityRepresentativeName},</if>
+            <if test="securityRepresentativeContacts != null">#{securityRepresentativeContacts},</if>
+            <if test="fireControllerName != null">#{fireControllerName},</if>
+            <if test="fireControllerContacts != null">#{fireControllerContacts},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStdDept" parameterType="StdDept">
+        update std_dept
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="stdHouseId != null">std_house_id = #{stdHouseId},</if>
+            <if test="deptNature != null">dept_nature = #{deptNature},</if>
+            <if test="deptName != null">dept_name = #{deptName},</if>
+            <if test="police != null">police = #{police},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="legalRepresentativeIdType != null">legal_representative_id_type = #{legalRepresentativeIdType},</if>
+            <if test="legalRepresentativeId != null">legal_representative_id = #{legalRepresentativeId},</if>
+            <if test="legalRepresentativeName != null">legal_representative_name = #{legalRepresentativeName},</if>
+            <if test="legalRepresentativeContacts != null">legal_representative_contacts = #{legalRepresentativeContacts},</if>
+            <if test="leaderIdType != null">leader_id_type = #{leaderIdType},</if>
+            <if test="leaderId != null">leader_id = #{leaderId},</if>
+            <if test="leaderName != null">leader_name = #{leaderName},</if>
+            <if test="leaderContacts != null">leader_contacts = #{leaderContacts},</if>
+            <if test="securityRepresentativeIdType != null">security_representative_id_type = #{securityRepresentativeIdType},</if>
+            <if test="securityRepresentativeId != null">security_representative_id = #{securityRepresentativeId},</if>
+            <if test="securityRepresentativeName != null">security_representative_name = #{securityRepresentativeName},</if>
+            <if test="securityRepresentativeContacts != null">security_representative_contacts = #{securityRepresentativeContacts},</if>
+            <if test="fireControllerName != null">fire_controller_name = #{fireControllerName},</if>
+            <if test="fireControllerContacts != null">fire_controller_contacts = #{fireControllerContacts},</if>
+        </trim>
+        where dept_id = #{deptId}
+    </update>
+
+    <select id="existsByDeptId" resultType="int">
+		select count(1) from std_dept
+		where dept_id = #{deptId} limit 1
+	</select>
+
+    <delete id="deleteStdDeptByDeptId" parameterType="Long">
+        delete from std_dept where dept_id = #{deptId}
+    </delete>
+
+    <delete id="deleteStdDeptByDeptIds" parameterType="String">
+        delete from std_dept where dept_id in 
+        <foreach item="deptId" collection="array" open="(" separator="," close=")">
+            #{deptId}
+        </foreach>
+    </delete>
+
+    <select id="checkLastInsertId" resultType="int">
+        select last_insert_id()
+    </select>
+
+    <update id="addPeopleNumByDeptId"    parameterType="Long">
+        update std_dept set people_num = people_num+1 where dept_id = #{deptId}
+    </update>
+
+    <update id="reducePeopleNumByDeptId"     parameterType="Long">
+        update std_dept set people_num = people_num-1 where dept_id = #{deptId}
+    </update>
+
+    <select id="existsByStdHouseId" resultType="int">
+        select count(1) from std_dept
+        where std_house_id = #{stdHouseId} limit 1
+    </select>
+</mapper>

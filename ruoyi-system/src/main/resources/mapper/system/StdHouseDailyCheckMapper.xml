@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StdHouseDailyCheckMapper">
+    
+    <resultMap type="StdHouseDailyCheck" id="StdHouseDailyCheckResult">
+        <result property="checkId"    column="check_id"    />
+        <result property="houseId"    column="house_id"    />
+        <result property="checkDate"    column="check_date"    />
+        <result property="manageDate"    column="manage_date"    />
+        <result property="inspectorIdType"  column="inspector_id_type"   />
+        <result property="inspectorId"    column="inspector_id"    />
+        <result property="dangerType"    column="danger_type"    />
+        <result property="checkType"    column="check_type"    />
+        <result property="checkResult"    column="check_result"    />
+        <result property="manageResult"    column="manage_result"    />
+        <result property="remark"    column="remark"    />
+
+        <result property="inspectorName"  column="person_name"     />
+        <result property="stdAddress"    column="standard_address"      />
+    </resultMap>
+
+    <sql id="selectStdHouseDailyCheckVo">
+        select check_id, dc.house_id, check_date, inspector_id_type, inspector_id, danger_type, check_type, check_result, manage_result, dc.remark, manage_date, 
+            p.person_name,
+            h.standard_address
+        from std_house_daily_check dc
+            left join std_person p on p.person_id_type=inspector_id_type and p.person_id=inspector_id
+            left join std_house h on h.house_id = dc.house_id
+    </sql>
+
+    <select id="selectStdHouseDailyCheckList" parameterType="StdHouseDailyCheck" resultMap="StdHouseDailyCheckResult">
+        <include refid="selectStdHouseDailyCheckVo"/>
+        <where>
+            <if test="houseId != null">and dc.house_id = #{houseId}</if>
+            <if test="params.beginCheckDate != null and params.beginCheckDate != '' and params.endCheckDate != null and params.endCheckDate != ''"> and check_date between #{params.beginCheckDate} and #{params.endCheckDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectStdHouseDailyCheckByCheckId" parameterType="Long" resultMap="StdHouseDailyCheckResult">
+        <include refid="selectStdHouseDailyCheckVo"/>
+        where check_id = #{checkId}
+    </select>
+        
+    <insert id="insertStdHouseDailyCheck" parameterType="StdHouseDailyCheck" useGeneratedKeys="true" keyProperty="checkId">
+        insert into std_house_daily_check
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="houseId != null">house_id,</if>
+            <if test="checkDate != null">check_date,</if>
+            <if test="manageDate != null">manage_date,</if>
+            <if test="inspectorIdType != null">inspector_id_type,</if>
+            <if test="inspectorId != null">inspector_id,</if>
+            <if test="dangerType != null">danger_type,</if>
+            <if test="checkType != null">check_type,</if>
+            <if test="checkResult != null">check_result,</if>
+            <if test="manageResult != null">manage_result,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="houseId != null">#{houseId},</if>
+            <if test="checkDate != null">#{checkDate},</if>
+            <if test="manageDate != null">#{manageDate},</if>
+            <if test="inspectorIdType != null">#{inspectorIdType},</if>
+            <if test="inspectorId != null">#{inspectorId},</if>
+            <if test="dangerType != null">#{dangerType},</if>
+            <if test="checkType != null">#{checkType},</if>
+            <if test="checkResult != null">#{checkResult},</if>
+            <if test="manageResult != null">#{manageResult},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStdHouseDailyCheck" parameterType="StdHouseDailyCheck">
+        update std_house_daily_check
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="houseId != null">house_id = #{houseId},</if>
+            <if test="checkDate != null">check_date = #{checkDate},</if>
+            manage_date = #{manageDate},
+            <if test="inspectorIdType != null">inspector_id_type = #{inspectorIdType},</if>
+            <if test="inspectorId != null">inspector_id = #{inspectorId},</if>
+            <if test="dangerType != null">danger_type = #{dangerType},</if>
+            <if test="checkType != null">check_type = #{checkType},</if>
+            <if test="checkResult != null">check_result = #{checkResult},</if>
+            <if test="manageResult != null">manage_result = #{manageResult},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where check_id = #{checkId}
+    </update>
+
+    <delete id="deleteStdHouseDailyCheckByCheckId" parameterType="Long">
+        delete from std_house_daily_check where check_id = #{checkId}
+    </delete>
+
+    <delete id="deleteStdHouseDailyCheckByHouseId" parameterType="Long">
+        delete from std_house_daily_check where house_id = #{houseId}
+    </delete>
+
+    <delete id="deleteStdHouseDailyCheckByCheckIds" parameterType="String">
+        delete from std_house_daily_check where check_id in 
+        <foreach item="checkId" collection="array" open="(" separator="," close=")">
+            #{checkId}
+        </foreach>
+    </delete>
+
+
+</mapper>

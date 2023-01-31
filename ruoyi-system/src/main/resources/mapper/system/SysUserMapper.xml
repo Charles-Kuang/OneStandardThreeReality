@@ -23,8 +23,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"     column="update_by"    />
         <result property="updateTime"   column="update_time"  />
         <result property="remark"       column="remark"       />
+		<result property="userType"     column="user_type"    />
+		<result property="accountPoints"     column="account_points" />
+		<result property="accountPersonId"   column="person_id" />
         <association property="dept"    column="dept_id" javaType="SysDept" resultMap="deptResult" />
+		<association property="accountPerson"  column="person_id" javaType="StdPerson" resultMap="personResult" />
         <collection  property="roles"   javaType="java.util.List"           resultMap="RoleResult" />
+		<collection  property="accountTasks"   javaType="java.util.List"           resultMap="TaskResult" />
     </resultMap>
 	
     <resultMap id="deptResult" type="SysDept">
@@ -36,30 +41,50 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="leader"    column="leader"      />
         <result property="status"    column="dept_status" />
     </resultMap>
+
+	<resultMap id="personResult" type="StdPerson">
+		<id     property="personId"     column="person_id"      />
+		<result property="personName"   column="person_name"    />
+	</resultMap>
 	
     <resultMap id="RoleResult" type="SysRole">
         <id     property="roleId"       column="role_id"        />
         <result property="roleName"     column="role_name"      />
         <result property="roleKey"      column="role_key"       />
         <result property="roleSort"     column="role_sort"      />
-        <result property="dataScope"     column="data_scope"    />
+        <result property="dataScope"    column="data_scope"     />
         <result property="status"       column="role_status"    />
     </resultMap>
-	
+
+	<resultMap id="TaskResult" type="StdTask">
+		<id     property="taskId"      column="task_id"         />
+		<result property="taskName"    column="task_name"       />
+		<result property="taskContent" column="task_content"    />
+		<result property="taskStatus"  column="task_status"     />
+	</resultMap>
+
 	<sql id="selectUserVo">
-        select u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.avatar, u.phonenumber, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, 
+        select u.user_id, u.dept_id, u.user_name, u.nick_name, u.email, u.avatar, u.phonenumber, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, u.user_type, u.account_points,
         d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.status as dept_status,
-        r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope, r.status as role_status
+        r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope, r.status as role_status,
+		p.person_name,
+		ut.task_id, ut.task_status,
+		t.task_name, t.task_content
         from sys_user u
 		    left join sys_dept d on u.dept_id = d.dept_id
 		    left join sys_user_role ur on u.user_id = ur.user_id
 		    left join sys_role r on r.role_id = ur.role_id
+			left join std_person p on u.person_id = p.person_id
+			left join std_user_task ut on u.user_id = ut.user_id
+			left join std_task t on t.task_id = ut.task_id
     </sql>
     
     <select id="selectUserList" parameterType="SysUser" resultMap="SysUserResult">
-		select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader from sys_user u
-		left join sys_dept d on u.dept_id = d.dept_id
-		where u.del_flag = '0'
+		select u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
+		d.dept_name, d.leader
+		from sys_user u
+			left join sys_dept d on u.dept_id = d.dept_id
+			where u.del_flag = '0'
 		<if test="userId != null and userId != 0">
 			AND u.user_id = #{userId}
 		</if>
@@ -156,6 +181,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="status != null and status != ''">status,</if>
  			<if test="createBy != null and createBy != ''">create_by,</if>
  			<if test="remark != null and remark != ''">remark,</if>
+			<if test="userType != null and userType != ''">user_type,</if>
+			<if test="accountPoints != null and accountPoints != 0">account_points</if>
  			create_time
  		)values(
  			<if test="userId != null and userId != ''">#{userId},</if>
@@ -170,6 +197,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="status != null and status != ''">#{status},</if>
  			<if test="createBy != null and createBy != ''">#{createBy},</if>
  			<if test="remark != null and remark != ''">#{remark},</if>
+			<if test="userType != null and userType != ''">#{userType},</if>
+			<if test="accountPoints != null and accountPoints != 0">#{accountPoints},</if>
  			sysdate()
  		)
 	</insert>
@@ -190,6 +219,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="loginDate != null">login_date = #{loginDate},</if>
  			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
  			<if test="remark != null">remark = #{remark},</if>
+			<if test="accountPoints != null and accountPoints != 0">account_points = #{accountPoints},</if>
  			update_time = sysdate()
  		</set>
  		where user_id = #{userId}

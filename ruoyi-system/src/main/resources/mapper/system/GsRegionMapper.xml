@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GsRegionMapper">
+    
+    <resultMap type="GsRegion" id="GsRegionResult">
+        <result property="regionId"    column="region_id"    />
+        <result property="parentCode"    column="parent_code"    />
+        <result property="parentName"    column="parent_name"    />
+        
+        <result property="forefathers"    column="forefathers"    />
+        
+        <result property="police"    column="police"    />
+        <result property="code"    column="code"    />
+        
+        <result property="name"    column="name"    />
+        <result property="fullName"    column="full_name"    />
+        <result property="firstLetter"    column="first_letter"    />
+        <result property="lng"    column="lng"    />
+        <result property="lat"    column="lat"    />
+        <result property="geographicGrid"    column="geographic_grid"    />
+        <result property="geographicEnity"    column="geographic_enity"    />
+        <result property="type"    column="type"    />
+        <result property="hasChild"    column="has_child"    />
+        <result property="level"    column="level"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createUserId"    column="create_user_id"    />
+        <result property="createUser"    column="create_user"    />
+        <result property="createUserPhone"    column="create_user_phone"    />
+        <result property="lastUpdateTime"    column="last_update_time"    />
+        <result property="lastUpdateUser"    column="last_update_user"    />
+        <result property="lastUpdateUserId"    column="last_update_user_id"    />
+        <result property="lastUpdateUserPhone"    column="last_update_user_phone"    />
+        <result property="auditUser"    column="audit_user"    />
+        <result property="auditUserId"    column="audit_user_id"    />
+        <result property="auditState"    column="audit_state"    />
+        <result property="auditTime"    column="audit_time"    />
+        <result property="auditUserPhone"    column="audit_user_phone"    />
+        <result property="commitStatus"    column="commit_status"    />
+        <result property="deprecated"     column="deprecated"     />
+    </resultMap>
+
+    <sql id="selectGsRegionVo">
+        select region_id, parent_code, parent_name, forefathers, police, code, name, full_name, first_letter, lng, lat, 
+            geographic_grid, geographic_enity, r.type, has_child, level, r.create_time, create_user, u.phonenumber as create_user_phone, 
+            last_update_time, last_update_user, uu.phonenumber as last_update_user_phone, audit_user, audit_state, audit_user_phone, 
+            commit_status, deprecated, audit_time from gs_region r
+        left join sys_user u on u.user_name = create_user
+        left join sys_user uu on uu.user_name = last_update_user
+    </sql>
+
+    <select id="selectGsRegionList" parameterType="GsRegion" resultMap="GsRegionResult">
+        <include refid="selectGsRegionVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="police != null  and police != ''"> and police = #{police}</if>
+            <if test="code != null"> and code like concat('%', #{code}, '%')</if>
+            <if test="level != null"> and level = #{level}</if>
+            <if test="parentCode != null"> and parent_code = #{parentCode} </if>
+        </where>
+    </select>
+    
+    <select id="selectGsRegionByCode" parameterType="Long" resultMap="GsRegionResult">
+        <include refid="selectGsRegionVo"/>
+        where code = #{code}
+    </select>
+
+    <select id="selectForeFathersByRegionId" parameterType="Long">
+        select forefathers from gs_region where region_id = #{regionId}
+    </select>
+
+    <select id="selectNameByRegionCode" parameterType="Long" resultType="String">
+        select name from gs_region where code = #{code}
+    </select>
+
+    <select id="hasChildByRegionCode" parameterType="Long" resultType="int">
+		select count(1) from gs_region
+		where parent_code = #{regionCode} limit 1
+	</select>
+
+    <select id="uncheckedAuditState" parameterType="Long" resultType="int">
+        select count(1) from gs_region
+        where code = #{regionCode} and audit_state = 1 limit 1
+    </select>
+        
+    <insert id="insertGsRegion" parameterType="GsRegion" useGeneratedKeys="true" keyProperty="regionId">
+        insert into gs_region
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="parentCode != null">parent_code,</if>
+            <if test="parentName != null">parent_name,</if>
+            <if test="forefathers != null">forefathers,</if>
+            <if test="police != null">police,</if>
+            <if test="code != null">code,</if>
+            <if test="name != null">name,</if>
+            <if test="fullName != null">full_name,</if>
+            <if test="firstLetter != null">first_letter,</if>
+            <if test="lng != null">lng,</if>
+            <if test="lat != null">lat,</if>
+            <if test="geographicGrid != null">geographic_grid,</if>
+            <if test="geographicEnity != null">geographic_enity,</if>
+            <if test="type != null">type,</if>
+            <if test="hasChild != null">has_child,</if>
+            <if test="level != null">level,</if>
+            create_time,
+            create_user_id,
+            create_user,
+            <if test="createUserPhone != null">create_user_phone,</if>
+            <if test="lastUpdateTime != null">last_update_time,</if>
+            <if test="lastUpdateUser != null">last_update_user,</if>
+            <if test="lastUpdateUserId != null">last_update_user_id,</if>
+            <if test="lastUpdateUserPhone != null">last_update_user_phone,</if>
+            <if test="auditUser != null">audit_user,</if>
+            <if test="auditUserId != null">audit_user_id,</if>
+            <if test="auditState != null">audit_state,</if>
+            <if test="auditUserPhone != null">audit_user_phone,</if>
+            <if test="commitStatus != null">commit_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="parentCode != null">#{parentCode},</if>
+            <if test="parentName != null">#{parentName},</if>
+            <if test="forefathers != null">#{forefathers},</if>
+            <if test="police != null">#{police},</if>
+            <if test="code != null">#{code},</if>
+            <if test="name != null">#{name},</if>
+            <if test="fullName != null">#{fullName},</if>
+            <if test="firstLetter != null">#{firstLetter},</if>
+            <if test="lng != null">#{lng},</if>
+            <if test="lat != null">#{lat},</if>
+            <if test="geographicGrid != null">#{geographicGrid},</if>
+            <if test="geographicEnity != null">#{geographicEnity},</if>
+            <if test="type != null">#{type},</if>
+            <if test="hasChild != null">#{hasChild},</if>
+            <if test="level != null">#{level},</if>
+            sysdate(),
+            1,
+            'admin',
+            <if test="createUserPhone != null">#{createUserPhone},</if>
+            <if test="lastUpdateTime != null">#{lastUpdateTime},</if>
+            <if test="lastUpdateUser != null">#{lastUpdateUser},</if>
+            <if test="lastUpdateUserId != null">#{lastUpdateUserId},</if>
+            <if test="lastUpdateUserPhone != null">#{lastUpdateUserPhone},</if>
+            <if test="auditUser != null">#{auditUser},</if>
+            <if test="auditUserId != null">#{auditUserId},</if>
+            <if test="auditState != null">#{auditState},</if>
+            <if test="auditUserPhone != null">#{auditUserPhone},</if>
+            <if test="commitStatus != null">#{commitStatus},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGsRegion" parameterType="GsRegion">
+        update gs_region
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="parentCode != null">parent_code = #{parentCode},</if>
+            <if test="parentName != null">parent_name = #{parentName},</if>
+            <if test="forefathers != null">forefathers = #{forefathers},</if>
+            <if test="police != null">police = #{police},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="fullName != null">full_name = #{fullName},</if>
+            <if test="firstLetter != null">first_letter = #{firstLetter},</if>
+            <if test="lng != null">lng = #{lng},</if>
+            <if test="lat != null">lat = #{lat},</if>
+            <if test="geographicGrid != null">geographic_grid = #{geographicGrid},</if>
+            <if test="geographicEnity != null">geographic_enity = #{geographicEnity},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="hasChild != null">has_child = #{hasChild},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="createUserPhone != null">create_user_phone = #{createUserPhone},</if>
+            last_update_time = sysdate(),
+            last_update_user = 'admin',
+            <if test="lastUpdateUserPhone != null">last_update_user_phone = #{lastUpdateUserPhone},</if>
+            <if test="auditUser != null">audit_user = #{auditUser},</if>
+            <if test="auditUserId != null">audit_user_id = #{auditUserId},</if>
+            <if test="auditState != null">audit_state = #{auditState},</if>
+            <if test="auditState != null">audit_time = sysdate(),</if>
+            <if test="auditUserPhone != null">audit_user_phone = #{auditUserPhone},</if>
+            <if test="commitStatus != null">commit_status = #{commitStatus},</if>
+            <if test="deprecated != null">deprecated = #{deprecated},</if>
+        </trim>
+        where region_id = #{regionId}
+    </update>
+
+    <update id="updateForefathers" >
+        update gs_region set `forefathers` =
+        replace (
+        `forefathers`,
+        #{arg0},
+        #{arg1}
+        )
+    </update>
+
+    <delete id="deleteGsRegionByCode" parameterType="Long">
+        delete from gs_region where code = #{code}
+    </delete>
+
+    <select id="existsByCode" resultType="int">
+        select count(0) from gs_region where code = #{code} limit 1
+    </select>
+
+
+</mapper>

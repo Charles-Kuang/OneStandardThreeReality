@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StdDeptTypeDetailsMapper">
+
+	<resultMap type="StdDeptTypeDetails" id="DeptTypeDetailsResult">
+		<id property="detailId"    column="detail_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="deptName"    column="dept_name" />
+        <result property="deptType"    column="dept_type"    />
+        <result property="businessStatus"    column="business_status"    />
+        <result property="businessProject"    column="business_project"    />
+        <result property="viceProject"    column="vice_project"    />
+        <result property="rating"    column="rating"    />
+        <result property="area"    column="area"    />
+        <result property="policeRepresentativeId"    column="police_representative_id"    />
+        <result property="policeRepresentativeName"    column="police_representative_name"    />
+	</resultMap>
+
+    <delete id="deleteDeptDetailsByDeptId" parameterType="Long">
+        delete from std_dept_type_details where dept_id = #{deptId}
+    </delete>
+
+    <delete id="deleteDeptDetails" parameterType="Long">
+        delete from std_dept_type_details where dept_id in
+        <foreach collection="array" item="deptId" open="(" separator="," close=")">
+            #{deptId}
+        </foreach>
+    </delete>
+
+    <insert id="batchDeptDetails">
+        insert into std_dept_type_details (dept_id, dept_type) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.deptId}, #{item.deptType})
+        </foreach>
+    </insert>
+
+     <sql id="selectStdDeptTypeDetailsVo">
+        select detail_id, dtd.dept_id, dtd.dept_type, business_status, business_project, vice_project, rating, area, police_representative_id, police_representative_name,
+        d.dept_name
+        from std_dept_type_details dtd
+            left join std_dept d on d.dept_id = dtd.dept_id
+    </sql>
+
+    <select id="selectStdDeptTypeDetailsList" parameterType="StdDeptTypeDetails" resultMap="DeptTypeDetailsResult">
+        <include refid="selectStdDeptTypeDetailsVo"/>
+        <where>  
+            <if test="deptId != null and deptId != ''"> and dtd.dept_id = #{deptId} </if>
+        </where>
+    </select>
+    
+    <select id="selectStdDeptTypeDetailsByDetailId" parameterType="Long" resultMap="DeptTypeDetailsResult">
+        <include refid="selectStdDeptTypeDetailsVo"/>
+        where detail_id = #{detailId}
+    </select>
+        
+    <insert id="insertStdDeptTypeDetails" parameterType="StdDeptTypeDetails">
+        insert into std_dept_type_details
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="detailId != null">detail_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="deptType != null">dept_type,</if>
+            <if test="businessStatus != null">business_status,</if>
+            <if test="businessProject != null">business_project,</if>
+            <if test="viceProject != null">vice_project,</if>
+            <if test="rating != null">rating,</if>
+            <if test="area != null">area,</if>
+            <if test="policeRepresentativeId != null">police_representative_id,</if>
+            <if test="policeRepresentativeName != null">police_representative_name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="detailId != null">#{detailId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="deptType != null">#{deptType},</if>
+            <if test="businessStatus != null">#{businessStatus},</if>
+            <if test="businessProject != null">#{businessProject},</if>
+            <if test="viceProject != null">#{viceProject},</if>
+            <if test="rating != null">#{rating},</if>
+            <if test="area != null">#{area},</if>
+            <if test="policeRepresentativeId != null">#{policeRepresentativeId},</if>
+            <if test="policeRepresentativeName != null">#{policeRepresentativeName},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStdDeptTypeDetails" parameterType="StdDeptTypeDetails">
+        update std_dept_type_details
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="deptType != null">dept_type = #{deptType},</if>
+            <if test="businessStatus != null">business_status = #{businessStatus},</if>
+            <if test="businessProject != null">business_project = #{businessProject},</if>
+            <if test="viceProject != null">vice_project = #{viceProject},</if>
+            <if test="rating != null">rating = #{rating},</if>
+            area = #{area},
+            <if test="policeRepresentativeId != null">police_representative_id = #{policeRepresentativeId},</if>
+            <if test="policeRepresentativeName != null">police_representative_name = #{policeRepresentativeName},</if>
+        </trim>
+        where detail_id = #{detailId}
+    </update>
+
+    <delete id="deleteStdDeptTypeDetailsByDetailId" parameterType="Long">
+        delete from std_dept_type_details where detail_id = #{detailId}
+    </delete>
+
+    <delete id="deleteStdDeptTypeDetailsByDetailIds" parameterType="String">
+        delete from std_dept_type_details where detail_id in 
+        <foreach item="detailId" collection="array" open="(" separator="," close=")">
+            #{detailId}
+        </foreach>
+    </delete>
+</mapper>

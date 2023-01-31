@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StdInvolvedMapper">
+    
+    <resultMap type="StdInvolved" id="StdInvolvedResult">
+        <result property="involvedId"    column="involved_id"    />
+        <result property="involvedEntityType"    column="involved_entity_type"    />
+        <result property="involvedEntityId"    column="involved_entity_id"    />
+        <result property="involvedEntityName"    column="involved_entity_name"    />
+        <result property="caseDate"    column="case_date"    />
+        <result property="caseType"    column="case_type"    />
+        <result property="caseName"    column="case_name"    />
+        <result property="dangerDegree"    column="danger_degree"    />
+        <result property="stdAddress"  column="std_address"      />
+    </resultMap>
+
+    <sql id="selectStdHouseInvolvedVo">
+        select involved_id, involved_entity_type, involved_entity_id, case_date, case_type, case_name, danger_degree, 
+        h.standard_address as std_address, h.house_name as involved_entity_name
+        from std_involved i 
+        left join std_house h on i.involved_entity_id = h.house_id
+    </sql>
+
+    <sql id="selectStdDeptInvolvedVo">
+        select involved_id, involved_entity_type, involved_entity_id, case_date, case_type, case_name, danger_degree, 
+        dh.standard_address as std_address, d.dept_name as involved_entity_name
+        from std_involved i 
+        left join std_dept d on i.involved_entity_id = d.dept_id
+        left join std_house dh on d.std_house_id = dh.house_id
+    </sql>
+
+    <select id="selectStdHouseInvolvedList" parameterType="StdInvolved" resultMap="StdInvolvedResult">
+        <include refid="selectStdHouseInvolvedVo"/>
+        <where>  
+            <if test="involvedEntityType != null"> and involved_entity_type = #{involvedEntityType} </if>
+            <if test="involvedEntityId != null"> and involved_entity_id = #{involvedEntityId} </if>
+        </where>
+    </select>
+
+    <select id="selectStdDeptInvolvedList" parameterType="StdInvolved" resultMap="StdInvolvedResult">
+        <include refid="selectStdDeptInvolvedVo"/>
+        <where>  
+            <if test="involvedEntityType != null"> and involved_entity_type = #{involvedEntityType} </if>
+            <if test="involvedEntityId != null"> and involved_entity_id = #{involvedEntityId} </if>
+        </where>
+    </select>
+    
+    <select id="selectStdHouseInvolvedByInvolvedId" parameterType="Long" resultMap="StdInvolvedResult">
+        <include refid="selectStdHouseInvolvedVo"/>
+        where involved_id = #{involvedId}
+    </select>
+
+    <select id="selectStdDeptInvolvedByInvolvedId" parameterType="Long" resultMap="StdInvolvedResult">
+        <include refid="selectStdDeptInvolvedVo"/>
+        where involved_id = #{involvedId}
+    </select>
+        
+    <insert id="insertStdInvolved" parameterType="StdInvolved" useGeneratedKeys="true" keyProperty="involvedId">
+        insert into std_involved
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="involvedEntityType != null">involved_entity_type,</if>
+            <if test="involvedEntityId != null">involved_entity_id,</if>
+            <if test="caseDate != null">case_date,</if>
+            <if test="caseType != null and caseType != ''">case_type,</if>
+            <if test="caseName != null and caseName != ''">case_name,</if>
+            <if test="dangerDegree != null and dangerDegree != ''">danger_degree,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="involvedEntityType != null">#{involvedEntityType},</if>
+            <if test="involvedEntityId != null">#{involvedEntityId},</if>
+            <if test="caseDate != null">#{caseDate},</if>
+            <if test="caseType != null and caseType != ''">#{caseType},</if>
+            <if test="caseName != null and caseName != ''">#{caseName},</if>
+            <if test="dangerDegree != null and dangerDegree != ''">#{dangerDegree},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStdInvolved" parameterType="StdInvolved">
+        update std_involved
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="involvedEntityType != null">involved_entity_type = #{involvedEntityType},</if>
+            <if test="involvedEntityId != null">involved_entity_id = #{involvedEntityId},</if>
+            <if test="caseDate != null">case_date = #{caseDate},</if>
+            <if test="caseType != null and caseType != ''">case_type = #{caseType},</if>
+            <if test="caseName != null and caseName != ''">case_name = #{caseName},</if>
+            <if test="dangerDegree != null and dangerDegree != ''">danger_degree = #{dangerDegree},</if>
+        </trim>
+        where involved_id = #{involvedId}
+    </update>
+
+    <delete id="deleteStdInvolvedByInvolvedId" parameterType="Long">
+        delete from std_involved where involved_id = #{involvedId}
+    </delete>
+
+    <delete id="deleteStdInvolvedByInvolvedIds" parameterType="String">
+        delete from std_involved where involved_id in 
+        <foreach item="involvedId" collection="array" open="(" separator="," close=")">
+            #{involvedId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteStdInvolvedByInvolvedEntity">
+        delete from std_involved 
+        where 
+        involved_entity_type = #{arg0}
+        and
+        involved_entity_id = #{arg1}
+    </delete>
+</mapper>

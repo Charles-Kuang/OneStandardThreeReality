@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StdPersonTrackMapper">
+    
+    <resultMap type="StdPersonTrack" id="StdPersonTrackResult">
+        <result property="trackId"    column="track_id"    />
+        <result property="personIdType"    column="person_id_type"    />
+        <result property="personId"    column="person_id"    />
+        <result property="oldHouseId"    column="old_house_id"    />
+        <result property="newHouseId"    column="new_house_id"    />
+        <result property="moveDate"    column="move_date"    />
+        <result property="oldAddress"   column="old_address" />
+        <result property="newAddress"   column="new_address" />
+    </resultMap>
+
+    <sql id="selectStdPersonTrackVo">
+        select track_id, person_id_type, person_id, old_house_id, new_house_id, move_date,
+        oh.standard_address as old_address,
+        nh.standard_address as new_address
+        from std_person_track
+            left join std_house oh on old_house_id = oh.house_id
+            left join std_house nh on new_house_id = nh.house_id
+    </sql>
+
+    <select id="selectStdPersonTrackList" parameterType="StdPersonTrack" resultMap="StdPersonTrackResult">
+        <include refid="selectStdPersonTrackVo"/>
+        <where>  
+            <if test="personIdType != null"> and person_id_type = #{personIdType} </if>
+            <if test="personId != null"> and person_id = #{personId} </if>
+        </where>
+    </select>
+    
+    <select id="selectStdPersonTrackByTrackId" parameterType="Long" resultMap="StdPersonTrackResult">
+        <include refid="selectStdPersonTrackVo"/>
+        where track_id = #{trackId}
+    </select>
+        
+    <insert id="insertStdPersonTrack" parameterType="StdPersonTrack" useGeneratedKeys="true" keyProperty="trackId">
+        insert into std_person_track
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="personIdType != null">person_id_type,</if>
+            <if test="personId != null">person_id,</if>
+            <if test="oldHouseId != null">old_house_id,</if>
+            <if test="newHouseId != null">new_house_id,</if>
+            <if test="moveDate != null">move_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="personIdType != null">#{personIdType},</if>
+            <if test="personId != null">#{personId},</if>
+            <if test="oldHouseId != null">#{oldHouseId},</if>
+            <if test="newHouseId != null">#{newHouseId},</if>
+            <if test="moveDate != null">#{moveDate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStdPersonTrack" parameterType="StdPersonTrack">
+        update std_person_track
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="personIdType != null">person_id_type = #{personIdType},</if>
+            <if test="personId != null">person_id = #{personId},</if>
+            <if test="oldHouseId != null">old_house_id = #{oldHouseId},</if>
+            <if test="newHouseId != null">new_house_id = #{newHouseId},</if>
+            <if test="moveDate != null">move_date = #{moveDate},</if>
+        </trim>
+        where track_id = #{trackId}
+    </update>
+
+    <delete id="deleteStdPersonTrackByTrackId" parameterType="Long">
+        delete from std_person_track where track_id = #{trackId}
+    </delete>
+
+    <delete id="deleteStdPersonTrackByPerson">
+        delete from std_person_track
+        where person_id_type = #{arg0} and person_id = #{arg1}
+    </delete>
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StdConsultationMapper">
+    
+    <resultMap type="StdConsultation" id="StdConsultationResult">
+        <result property="consultationId"    column="consultation_id"    />
+        <result property="consultationHostId"    column="consultation_host_id"    />
+        <result property="consultationHostName"    column="consultation_host_name"    />
+        <result property="consultationClientId"    column="consultation_client_id"    />
+        <result property="consultationClientName"    column="consultation_client_name"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="lastActiveTime"    column="last_active_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="consultationRating"    column="consultation_rating"    />
+        <result property="consultationComment"    column="consultation_comment"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+
+    <sql id="selectStdConsultationVo">
+        select c.consultation_id, u.user_name as consultation_host_name, uu.user_name as consultation_client_name, c.start_time, c.last_active_time, c.end_time, c.consultation_rating, c.consultation_comment, c.del_flag 
+        from 
+            std_consultation c
+            left join sys_user u on c.consultation_host_id = u.user_id 
+            left join sys_user uu on c.consultation_client_id = uu.user_id
+    </sql>
+
+    <select id="selectStdConsultationList" parameterType="StdConsultation" resultMap="StdConsultationResult">
+        <include refid="selectStdConsultationVo"/>
+        <where>  
+            <if test="consultationHostName != null and consultationHostName != ''"> and u.user_name like concat ('%', #{consultationHostName}, '%')</if>
+            <if test="consultationClientName != null and consultationClientName != ''"> and uu.user_name like concat ('%', #{consultationClientName}, '%')</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(c.start_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(c.start_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+            <if test="consultationRating != null "> and consultation_rating = #{consultationRating}</if>
+            <if test="consultationComment != null  and consultationComment != ''"> and consultation_comment like concat('%', #{consultationComment}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectStdConsultationByConsultationId" parameterType="Long" resultMap="StdConsultationResult">
+        <include refid="selectStdConsultationVo"/>
+        where consultation_id = #{consultationId}
+    </select>
+        
+    <insert id="insertStdConsultation" parameterType="StdConsultation" useGeneratedKeys="true" keyProperty="consultationId">
+        insert into std_consultation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="consultationHostId != null">consultation_host_id,</if>
+            <if test="consultationClientId != null">consultation_client_id,</if>
+            start_time,
+            last_active_time,
+            <if test="endTime != null">end_time,</if>
+            <if test="consultationRating != null">consultation_rating,</if>
+            <if test="consultationComment != null">consultation_comment,</if>
+            <if test="delFlag != null">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="consultationHostId != null">#{consultationHostId},</if>
+            <if test="consultationClientId != null">#{consultationClientId},</if>
+            sysdate(),
+            sysdate(),
+            <if test="endTime != null">#{endTime},</if>
+            <if test="consultationRating != null">#{consultationRating},</if>
+            <if test="consultationComment != null">#{consultationComment},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStdConsultation" parameterType="StdConsultation">
+        update std_consultation
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="lastActiveTime != null">last_active_time = #{lastActiveTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="consultationRating != null">consultation_rating = #{consultationRating},</if>
+            <if test="consultationComment != null">consultation_comment = #{consultationComment},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where consultation_id = #{consultationId}
+    </update>
+
+    <update id="deleteStdConsultationByConsultationId" parameterType="Long">
+        update std_consultation set del_flag = 1 where consultation_id = #{consultationId}
+    </update>
+
+    <update id="deleteStdConsultationByConsultationIds" parameterType="String">
+        update std_consultation set del_flag = 1 where consultation_id in
+        <foreach item="consultationId" collection="array" open="(" separator="," close=")">
+            #{consultationId}
+        </foreach>
+    </update>
+
+    <update id="endConsultationByConsultationId" parameterType="Long">
+        update std_consultation set end_time = sysdate() where consultation_id = #{consultationId}
+    </update>
+</mapper>

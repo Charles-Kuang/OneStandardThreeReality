@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StdHouseMapper">
+    
+    <resultMap type="StdHouse" id="StdHouseResult">
+        <result property="houseId"    column="house_id"    />
+        
+        <result property="residentialVillageName"    column="residential_village_name"    />
+        <result property="doorNumber"    column="door_number"    />
+        <result property="houseNumber"    column="house_number"    />
+        <result property="controlNumber"    column="control_number"    />
+        <result property="houseUsage"    column="house_usage"    />
+        <result property="hostIdType"   column="host_id_type"     />
+        <result property="hostId"    column="host_id"    />
+        <result property="standardAddress"    column="standard_address"    />
+        <result property="houseName"    column="house_name"    />
+        <result property="houseType"    column="house_type"    />
+        <result property="controlDegree"    column="control_degree"    />
+        <result property="propertyRight"    column="property_right"    />
+        <result property="controlReason"    column="control_reason"    />
+        <result property="houseArea"    column="house_area"    />
+        <result property="responsibilitySignature"    column="responsibility_signature"    />
+        <result property="roomQuantity"    column="room_quantity"    />
+        <result property="houseDeposit"    column="house_deposit"    />
+        <result property="remark"    column="remark"    />
+
+        <result property="positionCode"    column="position_code"     />
+        <result property="provinceCode"    column="province_code"    />
+        <result property="cityCode"    column="city_code"    />
+        <result property="districtCode"    column="district_code"    />
+        <result property="streetCode"    column="street_code"    />        
+    </resultMap>
+
+    <sql id="selectStdHouseVo">
+        select house_id, position_code, residential_village_name, door_number, house_number, control_number, house_usage, host_id_type, host_id, standard_address, house_name, house_type, control_degree, property_right, control_reason, house_area, responsibility_signature, room_quantity, house_deposit, remark, 
+        forefathers
+        from std_house h
+        left join gs_region r on h.position_code = r.code
+    </sql>
+
+    <select id="selectStdHouseList" resultMap="StdHouseResult">
+        <include refid="selectStdHouseVo"/>
+        <where>  
+            <if test="houseId != null"> and house_id = #{houseId} </if>
+            <if test="cityCode == null and provinceCode != null"> and forefathers like concat ('0,', #{provinceCode}, ',%') </if>
+            <if test="districtCode == null and cityCode != null"> and forefathers like concat ('%,', #{cityCode}, ',%') </if>
+            <if test="streetCode == null and districtCode != null"> and forefathers like concat ('%,', #{districtCode}, ',%') </if>
+            <if test="positionCode == null and streetCode != null"> and forefathers like concat ('%,', #{streetCode}) </if>
+            <if test="positionCode != null "> and position_code = #{positionCode}</if>
+            <if test="residentialVillageName != null  and residentialVillageName != ''"> and residential_village_name like concat('%', #{residentialVillageName}, '%')</if>
+            <if test="doorNumber != null "> and door_number = #{doorNumber}</if>
+            <if test="houseNumber != null "> and house_number = #{houseNumber}</if>
+            <if test="controlNumber != null "> and control_number = #{controlNumber}</if>
+            <if test="houseUsage != null  and houseUsage != ''"> and house_usage = #{houseUsage}</if>
+            <if test="hostIdType != null  and hostIdType != ''"> and host_id_type = #{hostIdType}</if>
+            <if test="hostId != null  and hostId != ''"> and host_id = #{hostId}</if>
+            <if test="standardAddress != null  and standardAddress != ''"> and standard_address = #{standardAddress}</if>
+            <if test="houseName != null  and houseName != ''"> and house_name like concat('%', #{houseName}, '%')</if>
+            <if test="houseType != null  and houseType != ''"> and house_type = #{houseType}</if>
+            <if test="controlDegree != null  and controlDegree != ''"> and control_degree = #{controlDegree}</if>
+            <if test="propertyRight != null  and propertyRight != ''"> and property_right = #{propertyRight}</if>
+            <if test="params.beginHouseArea != null and params.beginHouseArea != '' and params.endHouseArea != null and params.endHouseArea != ''"> and house_area between #{params.beginHouseArea} and #{params.endHouseArea}</if>
+            <if test="responsibilitySignature != null  and responsibilitySignature != ''"> and responsibility_signature = #{responsibilitySignature}</if>
+            <if test="params.beginRoomQuantity != null and params.beginRoomQuantity != '' and params.endRoomQuantity != null and params.endRoomQuantity != ''"> and room_quantity between #{params.beginRoomQuantity} and #{params.endRoomQuantity}</if>
+            <if test="houseDeposit != null  and houseDeposit != ''"> and house_deposit = #{houseDeposit}</if>
+            <if test="roomQuantity != null"> and room_quantity = #{roomQuantity} </if>
+        </where>
+    </select>
+    
+    <select id="selectStdHouseByHouseId" parameterType="Long" resultMap="StdHouseResult">
+        <include refid="selectStdHouseVo"/>
+        where house_id = #{houseId}
+    </select>
+        
+    <insert id="insertStdHouse" parameterType="StdHouse" useGeneratedKeys="true" keyProperty="houseId">
+        insert into std_house
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="houseId != null">house_id,</if>
+            <if test="positionCode != null">position_code,</if>
+            <if test="residentialVillageName != null">residential_village_name,</if>
+            <if test="doorNumber != null">door_number,</if>
+            <if test="houseNumber != null">house_number,</if>
+            <if test="controlNumber != null">control_number,</if>
+            <if test="houseUsage != null">house_usage,</if>
+            <if test="hostIdType != null">host_id_type,</if>
+            <if test="hostId != null">host_id,</if>
+            <if test="standardAddress != null">standard_address,</if>
+            <if test="houseName != null">house_name,</if>
+            <if test="houseType != null">house_type,</if>
+            <if test="controlDegree != null">control_degree,</if>
+            <if test="propertyRight != null">property_right,</if>
+            <if test="controlReason != null">control_reason,</if>
+            <if test="houseArea != null">house_area,</if>
+            <if test="responsibilitySignature != null">responsibility_signature,</if>
+            <if test="roomQuantity != null">room_quantity,</if>
+            <if test="houseDeposit != null">house_deposit,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="houseId != null">#{houseId},</if>
+            <if test="positionCode != null">#{positionCode},</if>
+            <if test="residentialVillageName != null">#{residentialVillageName},</if>
+            <if test="doorNumber != null">#{doorNumber},</if>
+            <if test="houseNumber != null">#{houseNumber},</if>
+            <if test="controlNumber != null">#{controlNumber},</if>
+            <if test="houseUsage != null">#{houseUsage},</if>
+            <if test="hostIdType != null">#{hostIdType},</if>
+            <if test="hostId != null">#{hostId},</if>
+            <if test="standardAddress != null">#{standardAddress},</if>
+            <if test="houseName != null">#{houseName},</if>
+            <if test="houseType != null">#{houseType},</if>
+            <if test="controlDegree != null">#{controlDegree},</if>
+            <if test="propertyRight != null">#{propertyRight},</if>
+            <if test="controlReason != null">#{controlReason},</if>
+            <if test="houseArea != null">#{houseArea},</if>
+            <if test="responsibilitySignature != null">#{responsibilitySignature},</if>
+            <if test="roomQuantity != null">#{roomQuantity},</if>
+            <if test="houseDeposit != null">#{houseDeposit},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStdHouse" parameterType="StdHouse">
+        update std_house
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="houseId != null">house_id = #{houseId},</if>
+            <if test="positionCode != null">position_code = #{positionCode},</if>
+            <if test="residentialVillageName != null">residential_village_name = #{residentialVillageName},</if>
+            <if test="doorNumber != null">door_number = #{doorNumber},</if>
+            <if test="houseNumber != null">house_number = #{houseNumber},</if>
+            <if test="controlNumber != null">control_number = #{controlNumber},</if>
+            <if test="houseUsage != null">house_usage = #{houseUsage},</if>
+            <if test="hostIdType != null">host_id_type = #{hostIdType},</if>
+            <if test="hostId != null">host_id = #{hostId},</if>
+            <if test="standardAddress != null">standard_address = #{standardAddress},</if>
+            <if test="houseName != null">house_name = #{houseName},</if>
+            <if test="houseType != null">house_type = #{houseType},</if>
+            <if test="controlDegree != null">control_degree = #{controlDegree},</if>
+            <if test="propertyRight != null">property_right = #{propertyRight},</if>
+            <if test="controlReason != null">control_reason = #{controlReason},</if>
+            <if test="houseArea != null">house_area = #{houseArea},</if>
+            <if test="responsibilitySignature != null">responsibility_signature = #{responsibilitySignature},</if>
+            <if test="roomQuantity != null">room_quantity = #{roomQuantity},</if>
+            <if test="houseDeposit != null">house_deposit = #{houseDeposit},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where house_id = #{houseId}
+    </update>
+
+    <select id="existsByHouseId" parameterType="Long" resultType="int">
+		select count(1) from std_house
+		where house_id = #{houseId} limit 1
+	</select>
+
+    <select id="existsByControlNumber" parameterType="Long" resultType="int">
+        select count(1) from std_house
+        where control_number = #{controlNumber} limit 1
+    </select>
+
+    <delete id="deleteStdHouseByHouseId" parameterType="Long">
+        delete from std_house where house_id = #{houseId}
+    </delete>
+
+    <delete id="deleteStdHouseByHouseIds" parameterType="String">
+        delete from std_house where house_id in 
+        <foreach item="houseId" collection="array" open="(" separator="," close=")">
+            #{houseId}
+        </foreach>
+    </delete>
+
+    <select id="existsByHostId" resultType="int">
+        select count(1) from std_house
+        where host_id_type = #{arg0} and host_id = #{arg1} limit 1
+    </select>
+
+    <select id="existsByPositionCode"   resultType="int">
+        select count(1) from std_house
+        where position_code = #{positionCode} limit 1
+    </select>
+</mapper>

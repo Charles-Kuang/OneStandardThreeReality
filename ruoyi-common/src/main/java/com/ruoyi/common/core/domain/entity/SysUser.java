@@ -89,10 +89,28 @@ public class SysUser extends BaseEntity
     /** 角色ID */
     private Long roleId;
 
-    public SysUser()
-    {
 
-    }
+    @Excel(name = "帐号类型", readConverterExp = "00=用户,01=管理员,02=商家,03=公司管理员")
+    private String userType;
+
+    @Excel(name = "账号积分")
+    private Integer accountPoints;
+
+    @Excel(name = "个体身份证号", type = Type.IMPORT)
+    private Long accountPersonId;
+
+    /** 个体对象 */
+    @Excel(name = "个体对象")
+    private StdPerson accountPerson;
+
+    private Long taskId;
+
+    private Long[] taskIds;
+
+    /** 任务对象 */
+    private List<StdTask> accountTasks;
+
+    public SysUser() {}
 
     public SysUser(Long userId)
     {
@@ -297,6 +315,62 @@ public class SysUser extends BaseEntity
         this.roleId = roleId;
     }
 
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    public Integer getAccountPoints() {
+        return accountPoints;
+    }
+
+    public void setAccountPoints(Integer accountPoints) {
+        this.accountPoints = accountPoints;
+    }
+
+    public Long getAccountPersonId() {
+        return accountPersonId;
+    }
+
+    public void setAccountPersonId(Long accountPersonId) {
+        this.accountPersonId = accountPersonId;
+    }
+
+    public StdPerson getAccountPerson() {
+        return accountPerson;
+    }
+
+    public void setAccountPerson(StdPerson accountPerson) {
+        this.accountPerson = accountPerson;
+    }
+
+    public Long getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
+    }
+
+    public Long[] getTaskIds() {
+        return taskIds;
+    }
+
+    public void setTaskIds(Long[] taskIds) {
+        this.taskIds = taskIds;
+    }
+
+    public List<StdTask> getAccountTasks() {
+        return accountTasks;
+    }
+
+    public void setAccountTasks(List<StdTask> accountTasks) {
+        this.accountTasks = accountTasks;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -319,6 +393,10 @@ public class SysUser extends BaseEntity
             .append("updateTime", getUpdateTime())
             .append("remark", getRemark())
             .append("dept", getDept())
+            .append("userType", getUserType())
+            .append("accountPoints", getAccountPoints())
+            .append("accountPersonId", getAccountPersonId())
+            .append("accountPerson", getAccountPerson())
             .toString();
     }
 }

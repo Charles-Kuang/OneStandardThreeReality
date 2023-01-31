@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GsRegionModificationHistoryMapper">
+    
+    <resultMap type="GsRegionModificationHistory" id="GsRegionModificationHistoryResult">
+        <result property="modificationId"    column="modification_id"    />
+        <result property="modificationRegionId"    column="modification_region_id"    />
+        <result property="modificationDate"    column="modification_date"    />
+        <result property="oldValue"    column="old_value"    />
+        <result property="newValue"    column="new_value"    />
+        
+        <result property="modificationRegionName"   column="modification_region_name"   />
+    </resultMap>
+
+    <sql id="selectGsRegionModificationHistoryVo">
+        select modification_id, modification_region_id, modification_date, old_value, new_value, 
+        r.name as modification_region_name
+        from gs_region_modification_history rmh
+        left join gs_region r on r.region_id = rmh.modification_region_id
+
+    </sql>
+
+    <select id="selectGsRegionModificationHistoryList" parameterType="GsRegionModificationHistory" resultMap="GsRegionModificationHistoryResult">
+        <include refid="selectGsRegionModificationHistoryVo"/>
+        <where>  
+            modification_region_id = #{modificationRegionId}
+        </where>
+    </select>
+    
+        
+    <insert id="insertGsRegionModificationHistory" parameterType="GsRegionModificationHistory" useGeneratedKeys="true" keyProperty="modificationId">
+        insert into gs_region_modification_history
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="modificationRegionId != null">modification_region_id,</if>
+            <if test="modificationDate != null">modification_date,</if>
+            <if test="oldValue != null and oldValue != ''">old_value,</if>
+            <if test="newValue != null and newValue != ''">new_value,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="modificationRegionId != null">#{modificationRegionId},</if>
+            <if test="modificationDate != null">#{modificationDate},</if>
+            <if test="oldValue != null and oldValue != ''">#{oldValue},</if>
+            <if test="newValue != null and newValue != ''">#{newValue},</if>
+         </trim>
+    </insert>
+
+    <delete id="deleteGsRegionModificationHistoryByModificationId" parameterType="Long">
+        delete from gs_region_modification_history where modification_id = #{modificationId}
+    </delete>
+
+    <delete id="deleteGsRegionModificationHistoryByRegionId" parameterType="Long">
+        delete from gs_region_modification_history where modification_region_id = #{arg0}
+    </delete>
+
+    <delete id="deleteGsRegionModificationHistoryByModificationIds" parameterType="String">
+        delete from gs_region_modification_history where modification_id in 
+        <foreach item="modificationId" collection="array" open="(" separator="," close=")">
+            #{modificationId}
+        </foreach>
+    </delete>
+</mapper>

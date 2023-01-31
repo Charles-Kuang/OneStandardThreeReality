@@ -65,12 +65,31 @@ export const constantRoutes = [
     path: '',
     component: Layout,
     redirect: 'index',
+    hidden: true,
     children: [
       {
         path: 'index',
         component: () => import('@/views/index'),
         name: 'Index',
         meta: { title: '首页', icon: 'dashboard', affix: true }
+      },
+      {
+        path: 'task',
+        component: () => import('@/views/task/index'),
+        name: 'TaskPage',
+        meta: { title:  '我的任务', noCache: true }
+      },
+      {
+        path: 'person/setting',
+        component: () => import('@/views/person/setting/index'),
+        name: 'SettingPage',
+        meta: { title:  '设置'  }
+      },
+      {
+        path: 'person/profile',
+        component: () => import('@/views/person/profile/index'),
+        name: 'ProfilePage',
+        meta: { title:  '我的信息'  }
       }
     ]
   },
@@ -161,7 +180,121 @@ export const dynamicRoutes = [
         meta: { title: '修改生成配置', activeMenu: '/tool/gen' }
       }
     ]
-  }
+  },
+  {
+    path: '/news/get-detail',
+    component: Layout,
+    hidden: true,
+    permissions: ['standard:news:detail'],
+    children: [
+      {
+        path: 'index/:newsId(\\d+)',
+        component: () => import('@/views/news/detail'),
+        name: 'NewsDetail',
+        meta: {title: '新闻内容', noCache: true, activeMenu: '/news'}
+      }
+    ]
+  },
+  {
+    path: '/consultation/get-detail',
+    component: Layout,
+    hidden: true,
+    permissions: ['standard:consultation:detail'],
+    children: [
+      {
+        path: 'index/:consultationId(\\d+)',
+        component: () => import('@/views/consultation/record'),
+        name: 'Record',
+        meta: {title: '会话内容', noCache: true, activeMenu: '/consultation'}
+      }
+    ]
+  },
+  {
+    path: '/standard/dept',
+    component: Layout,
+    hidden: true,
+    permissions: ['standard:dept:detail'],
+    children: [
+      {
+        path: "get-detail/:deptId(\\d+)",
+        component: () => import('@/views/standard/dept/detail'),
+        name: 'Detail',
+        meta: {title: '类别细节', noCache: true, activeMenu: '/standard/dept'}
+      },
+      {
+        path: "involvedCheck/:involvedEntityType/:involvedEntityId(\\d+)",
+        component: () => import('@/views/standard/involved'),
+        name: 'DeptInvolvedCheck',
+        meta: {title: '单位涉案', noCache: true, activeMenu: '/standard'}
+      }
+    ]
+  },
+  {
+    path: '/standard/house',
+    component: Layout,
+    hidden: true,
+    permissions: ['standard:house:detail'],
+    children: [
+      {
+        path: "dailyCheck/:houseId(\\d+)",
+        component: () => import('@/views/standard/house/check'),
+        name: 'DailyCheck',
+        meta: {title: '房屋细节', noCache: true, activeMenu: '/standard/house'}
+      },
+      {
+        path: "involvedCheck/:involvedEntityType/:involvedEntityId(\\d+)",
+        component: () => import('@/views/standard/involved'),
+        name: 'HouseInvolvedCheck',
+        meta: {title: '房屋涉案', noCache: true, activeMenu: '/standard'}
+      }
+    ]
+  },
+  {
+    path: '/standard/person',
+    component: Layout,
+    hidden: true,
+    permissions: ['standard:dept:detail'],
+    children: [
+      {
+        path: "get-residence/:residenceHouseId(\\d+)",
+        component: () => import('@/views/standard/person/index'),
+        name: 'Residence',
+        meta: {title: '户籍人员', noCache: true, activeMenu: '/standard/person'}
+      },
+      {
+        path: "get-current/:currentHouseId(\\d+)",
+        component: () => import('@/views/standard/person/index'),
+        name: 'Current',
+        meta: {title: '现住人员', noCache: true, activeMenu: '/standard/person'}
+      },
+      {
+        path: "get-dept/:deptId(\\d+)",
+        component: () => import('@/views/standard/person/index'),
+        name: 'Employee',
+        meta: {title: '工作人员', noCache: true, activeMenu: '/standard/person'}
+      },
+      {
+        path: "trackCheck/:personIdType/:personId",
+        component: () => import('@/views/standard/person/track'),
+        name: 'TrackCheck',
+        meta: {title: '流动轨迹', noCache: true, activeMenu: '/standard/person'}
+      }
+    ]
+  },
+  {
+    path: '/standard/region',
+    component: Layout,
+    hidden: true,
+    permissions: ['standard:region:detail'],
+    children: [
+      {
+        path: "modificationHistory/:modificationRegionId(\\d+)",
+        component: () => import('@/views/region/history'),
+        name: 'History',
+        meta: {title: '行政区修改痕迹', noCache: true, activeMenu: '/region'}
+      }
+    ]
+  },
 ]
 
 // 防止连续点击多次路由报错

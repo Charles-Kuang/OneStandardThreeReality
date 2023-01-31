@@ -1,4 +1,4 @@
-package com.ruoyi.system.domain;
+package com.ruoyi.common.core.domain.entity;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -43,6 +43,14 @@ public class StdNews extends BaseEntity
 
     /** 删除标志（0代表存在 2代表删除） */
     private String delFlag;
+
+    private String commentable;
+
+    private String remark;
+
+    private String thumbnail;
+
+    private String publish;
 
     public void setNewsId(Long newsId)
     {
@@ -115,6 +123,40 @@ public class StdNews extends BaseEntity
     public String getDelFlag()
     {
         return delFlag;
+    }
+
+    public String getCommentable() {
+        return commentable;
+    }
+
+    public void setCommentable(String commentable) {
+        this.commentable = commentable;
+    }
+
+    @Override
+    public String getRemark() {
+        return remark;
+    }
+
+    @Override
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public String getPublish() {
+        return publish;
+    }
+
+    public void setPublish(String publish) {
+        this.publish = publish;
     }
 
     @Override

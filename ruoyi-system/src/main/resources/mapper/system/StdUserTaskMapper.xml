@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StdUserTaskMapper">
+
+    <resultMap type="StdUserTask" id="StdUserTaskResult">
+        <result property="userId"     column="user_id"      />
+        <result property="taskId"     column="task_id"      />
+        <result property="taskStatus" column="task_status"  />
+    </resultMap>
+
+    <select id="countUserTaskByUserId" resultType="Integer">
+        select count(1) from std_user_task where user_id=#{userId}
+    </select>
+
+    <select id="countUserTaskByUserIdAndTaskStatus" resultType="Integer">
+        select count(1) from std_user_task where user_id=#{userId}
+        <if test="taskStatus != null and taskStatus != 0">and task_status = #{taskStatus}</if>
+    </select>
+
+</mapper> 

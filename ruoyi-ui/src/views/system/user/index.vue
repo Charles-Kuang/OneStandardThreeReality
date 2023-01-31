@@ -574,7 +574,9 @@ export default {
       this.reset();
       const userId = row.userId || this.ids;
       getUser(userId).then(response => {
+        console.log(response.data);
         this.form = response.data;
+        console.log("the data " , this.form);
         this.postOptions = response.posts;
         this.roleOptions = response.roles;
         this.$set(this.form, "postIds", response.postIds);

@@ -1,5 +1,7 @@
 package com.ruoyi.web.controller.system;
 
+import com.ruoyi.framework.web.domain.server.Sys;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +26,9 @@ import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.service.ISysUserService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 个人信息 业务处理
  * 
@@ -39,17 +44,26 @@ public class SysProfileController extends BaseController
     @Autowired
     private TokenService tokenService;
 
+
+
     /**
      * 个人信息
      */
     @GetMapping
-    public AjaxResult profile()
-    {
+    public AjaxResult profile() {
         LoginUser loginUser = getLoginUser();
         SysUser user = loginUser.getUser();
         AjaxResult ajax = AjaxResult.success(user);
         ajax.put("roleGroup", userService.selectUserRoleGroup(loginUser.getUsername()));
         ajax.put("postGroup", userService.selectUserPostGroup(loginUser.getUsername()));
+        ajax.put("taskGroup", userService.selectUserTaskGroup(loginUser.getUserId()));
+
+
+        List<Integer> taskCount = new ArrayList<>();
+        for (int status_num = 1; status_num <= 4; status_num++) {//4: total status number
+            taskCount.add(userService.countTasksByUserIdAndTaskStatus(loginUser.getUserId(), status_num));
+        }
+        ajax.put("taskCount", taskCount);
         return ajax;
     }
 

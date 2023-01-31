@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StdPersonMapper">
+    
+    <resultMap type="StdPerson" id="StdPersonResult">
+        <result property="id"    column="id"    />
+        <result property="personIdType"    column="person_id_type"    />
+        <result property="personId"    column="person_id"    />
+        <result property="personName"    column="person_name"    />
+        <result property="personGender"    column="person_gender"    />
+        <result property="personEnglishName"    column="person_english_name"    />
+        <result property="police"    column="police"    />
+        <result property="personType"    column="person_type"    />
+        <result property="relatedToStdPosition"    column="related_to_std_position"    />
+        <result property="residencePositionCode"    column="residence_position_code"    />
+        <result property="residenceStdHouseId"    column="residence_std_house_id"    />
+        
+        <result property="currentPositionCode"    column="current_position_code"    />
+        <result property="currentStdHouseId"    column="current_std_house_id"    />
+        <result property="nation"    column="nation"    />
+        <result property="birthday"    column="birthday"    />
+        <result property="occupation"    column="occupation"    />
+        <result property="married"    column="married"    />
+        <result property="degree"    column="degree"    />
+        <result property="contacts"    column="contacts"    />
+        <result property="tempResidenceReason"    column="temp_residence_reason"    />
+
+        <result property="residenceProvinceCode"  column="residence_province_code"    />
+        <result property="residenceCityCode"  column="residence_city_code"    />
+        <result property="residenceDistrictCode"  column="residence_district_code"    />
+        <result property="residenceStreetCode"  column="residence_street_code"    />
+        <result property="currentProvinceCode"  column="current_province_code"    />
+        <result property="currentCityCode"  column="current_city_code"    />
+        <result property="currentDistrictCode"  column="current_district_code"    />
+        <result property="currentStreetCode"  column="current_street_code"    />
+
+        <result property="residenceStdAddress" column="rh_standard_address" />
+        <result property="currentStdAddress" column="ch_standard_address" />
+
+        <result property="deptId" column="dept_id" />
+        <result property="deptName" column="dept_name" />
+        <result property="oldDeptId" column="old_dept_id" />
+    </resultMap>
+
+    <sql id="selectStdPersonVo">
+        select id, person_id_type, person_id, person_name, person_gender, person_english_name, p.police, person_type, related_to_std_position, residence_position_code, residence_std_house_id, current_position_code, current_std_house_id, nation, birthday, occupation, married, degree, contacts, temp_residence_reason, p.dept_id, old_dept_id,
+        rh.standard_address as rh_standard_address,
+        ch.standard_address as ch_standard_address,
+        rr.forefathers as rr_forefathers,
+        cr.forefathers as cr_forefathers, 
+        d.dept_name 
+        from std_person p
+        left join std_house rh on rh.house_id = p.residence_std_house_id
+        left join gs_region rr on rh.position_code = rr.code
+        left join std_house ch on ch.house_id = p.current_std_house_id
+        left join gs_region cr on ch.position_code = cr.code
+        left join std_dept d on p.dept_id = d.dept_id
+    </sql>
+
+    <select id="selectStdPersonList" parameterType="StdPerson" resultMap="StdPersonResult">
+        <include refid="selectStdPersonVo"/>
+        <where>  
+            <if test="residenceStdHouseId != null"> and residence_std_house_id = #{residenceStdHouseId}</if>
+            <if test="currentStdHouseId != null"> and current_std_house_id = #{currentStdHouseId}</if>
+            
+            <if test="residenceCityCode == null and residenceProvinceCode != null"> and rr.forefathers like concat ('0,', #{residenceProvinceCode}, ',%') </if>
+            <if test="residenceDistrictCode == null and residenceCityCode != null"> and rr.forefathers like concat ('%,', #{residenceCityCode}, ',%') </if>
+            <if test="residenceStreetCode == null and residenceDistrictCode != null"> and rr.forefathers like concat ('%,', #{residenceDistrictCode}, ',%') </if>
+            <if test="residencePositionCode == null and residenceStreetCode != null"> and rr.forefathers like concat ('%,', #{residenceStreetCode}) </if>
+            <if test="residencePositionCode != null "> and residence_position_code = #{residencePositionCode}</if>
+            
+            <if test="currentCityCode == null and currentProvinceCode != null"> and cr.forefathers like concat ('0,', #{currentProvinceCode}, ',%') </if>
+            <if test="currentDistrictCode == null and currentCityCode != null"> and cr.forefathers like concat ('%,', #{currentCityCode}, ',%') </if>
+            <if test="currentStreetCode == null and currentDistrictCode != null"> and cr.forefathers like concat ('%,', #{currentDistrictCode}, ',%') </if>
+            <if test="currentPositionCode == null and currentStreetCode != null"> and cr.forefathers like concat ('%,', #{currentStreetCode}) </if>
+            <if test="currentPositionCode != null "> and current_position_code = #{currentPositionCode}</if>
+            
+
+            <if test="personIdType != null  and personIdType != ''"> and person_id_type = #{personIdType}</if>
+            <if test="personId != null  and personId != ''"> and person_id = #{personId}</if>
+            <if test="personName != null  and personName != ''"> and person_name = #{personName}</if>
+            <if test="personGender != null  and personGender != ''"> and person_gender = #{personGender}</if>
+            <if test="personEnglishName != null  and personEnglishName != ''"> and person_english_name like concat('%', #{personEnglishName}, '%')</if>
+            <if test="police != null  and police != ''"> and p.police like concat('%', #{police}, '%')</if>
+            <if test="personType != null  and personType != ''"> and person_type = #{personType}</if>
+            <if test="relatedToStdPosition != null  and relatedToStdPosition != ''"> and related_to_std_position = #{relatedToStdPosition}</if>
+            <if test="nation != null  and nation != ''"> and nation like concat('%', #{nation}, '%')</if>
+            <if test="params.beginBirthday != null and params.beginBirthday != '' and params.endBirthday != null and params.endBirthday != ''"> and birthday between #{params.beginBirthday} and #{params.endBirthday}</if>
+            <if test="married != null  and married != ''"> and married = #{married}</if>
+            <if test="degree != null  and degree != ''"> and degree = #{degree}</if>
+            <if test="contacts != null and contacts != ''"> and contacts = #{contacts}</if>
+
+            <if test="deptId != null and deptId != ''"> and p.dept_id = #{deptId}</if>
+        </where>
+    </select>
+    
+    <select id="selectStdPersonById" parameterType="Long" resultMap="StdPersonResult">
+        <include refid="selectStdPersonVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertStdPerson" parameterType="StdPerson" useGeneratedKeys="true" keyProperty="id">
+        insert into std_person
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="personIdType != null and personIdType != ''">person_id_type,</if>
+            <if test="personId != null and personId != ''">person_id,</if>
+            <if test="personName != null and personName != ''">person_name,</if>
+            <if test="personGender != null and personGender != ''">person_gender,</if>
+            <if test="personEnglishName != null">person_english_name,</if>
+            <if test="police != null">police,</if>
+            <if test="personType != null">person_type,</if>
+            <if test="relatedToStdPosition != null">related_to_std_position,</if>
+            <if test="residencePositionCode != null">residence_position_code,</if>
+            <if test="residenceStdHouseId != null">residence_std_house_id,</if>
+            <if test="currentPositionCode != null">current_position_code,</if>
+            <if test="currentStdHouseId != null">current_std_house_id,</if>
+            <if test="nation != null">nation,</if>
+            <if test="birthday != null">birthday,</if>
+            <if test="occupation != null">occupation,</if>
+            <if test="married != null">married,</if>
+            <if test="degree != null">degree,</if>
+            <if test="contacts != null">contacts,</if>
+            <if test="tempResidenceReason != null">temp_residence_reason,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="oldDeptId != null">old_dept_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="personIdType != null and personIdType != ''">#{personIdType},</if>
+            <if test="personId != null and personId != ''">#{personId},</if>
+            <if test="personName != null and personName != ''">#{personName},</if>
+            <if test="personGender != null and personGender != ''">#{personGender},</if>
+            <if test="personEnglishName != null">#{personEnglishName},</if>
+            <if test="police != null">#{police},</if>
+            <if test="personType != null">#{personType},</if>
+            <if test="relatedToStdPosition != null">#{relatedToStdPosition},</if>
+            <if test="residencePositionCode != null">#{residencePositionCode},</if>
+            <if test="residenceStdHouseId != null">#{residenceStdHouseId},</if>
+            <if test="currentPositionCode != null">#{currentPositionCode},</if>
+            <if test="currentStdHouseId != null">#{currentStdHouseId},</if>
+            <if test="nation != null">#{nation},</if>
+            <if test="birthday != null">#{birthday},</if>
+            <if test="occupation != null">#{occupation},</if>
+            <if test="married != null">#{married},</if>
+            <if test="degree != null">#{degree},</if>
+            <if test="contacts != null">#{contacts},</if>
+            <if test="tempResidenceReason != null">#{tempResidenceReason},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="oldDeptId != null">#{oldDeptId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStdPerson" parameterType="StdPerson">
+        update std_person
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="personIdType != null and personIdType != ''">person_id_type = #{personIdType},</if>
+            <if test="personId != null and personId != ''">person_id = #{personId},</if>
+            <if test="personName != null and personName != ''">person_name = #{personName},</if>
+            <if test="personGender != null and personGender != ''">person_gender = #{personGender},</if>
+            <if test="personEnglishName != null">person_english_name = #{personEnglishName},</if>
+            <if test="police != null">police = #{police},</if>
+            <if test="personType != null">person_type = #{personType},</if>
+            <if test="relatedToStdPosition != null">related_to_std_position = #{relatedToStdPosition},</if>
+            <if test="residencePositionCode != null">residence_position_code = #{residencePositionCode},</if>
+            residence_std_house_id = #{residenceStdHouseId},
+            <if test="currentPositionCode != null">current_position_code = #{currentPositionCode},</if>
+            <if test="currentStdHouseId != null">current_std_house_id = #{currentStdHouseId},</if>
+            <if test="nation != null">nation = #{nation},</if>
+            <if test="birthday != null">birthday = #{birthday},</if>
+            <if test="occupation != null">occupation = #{occupation},</if>
+            <if test="married != null">married = #{married},</if>
+            <if test="degree != null">degree = #{degree},</if>
+            <if test="contacts != null">contacts = #{contacts},</if>
+            <if test="tempResidenceReason != null">temp_residence_reason = #{tempResidenceReason},</if>
+            dept_id = #{deptId},
+            old_dept_id = #{oldDeptId},
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="existsByPersonId" resultType="int">
+		select count(1) from std_person
+		where person_id_type = #{arg0} and person_id = #{arg1} limit 1
+	</select>
+
+    <select id="existsByCurrentStdHouseId" resultType="int">
+        select count(1) from std_person
+        where current_std_house_id = #{currentStdHouseId} limit 1
+    </select>
+
+    <delete id="deleteStdPersonById" parameterType="Long">
+        delete from std_person where id = #{id}
+    </delete>
+
+    <delete id="deleteStdPersonByIds" parameterType="String">
+        delete from std_person where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

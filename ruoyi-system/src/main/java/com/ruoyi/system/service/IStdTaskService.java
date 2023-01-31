@@ -1,13 +1,12 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.common.core.domain.entity.StdTask;
+import com.ruoyi.system.domain.StdUserTask;
 
 import java.util.List;
 
-public interface IStdUserTaskService {
+public interface IStdTaskService {
     public List<StdTask> selectTaskList(StdTask task);
 
-    public List<StdTask> selectTasksByUserId(Long userId);
-
-    public List<StdTask> selectTasksByUserIdAndTaskStatus(Long userId, int );
+    public List<StdTask> selectTaskListByUserIdAndTaskStatus(StdUserTask userTask);
 }

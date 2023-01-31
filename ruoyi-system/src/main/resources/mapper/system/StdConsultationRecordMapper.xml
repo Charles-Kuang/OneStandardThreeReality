@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StdConsultationRecordMapper">
+    
+    <resultMap type="StdConsultationRecord" id="StdConsultationRecordResult">
+        <result property="messageId"    column="message_id"    />
+        <result property="consultationId"    column="consultation_id"    />
+        <result property="messageSenderId"    column="message_sender_id"    />
+        <result property="messageSenderName"   column="message_sender_name"   />
+        <result property="messageContent"    column="message_content"    />
+        <result property="timeStamp"    column="time_stamp"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+
+    <sql id="selectStdConsultationRecordVo">
+        select message_id, consultation_id, message_sender_id, message_content, time_stamp, cr.del_flag,
+            u.user_name as message_sender_name
+        from std_consultation_record cr
+            left join sys_user u on cr.message_sender_id = u.user_id
+    </sql>
+
+    <select id="selectStdConsultationRecordList" parameterType="StdConsultationRecord" resultMap="StdConsultationRecordResult">
+        <include refid="selectStdConsultationRecordVo"/>
+        <where>  
+            <if test="consultationId != null "> and consultation_id = #{consultationId}</if>
+            <if test="messageSenderName != null  and messageSenderName != ''"> and u.user_name like concat('%', #{messageSenderName}, '%')</if>
+            <if test="messageContent != null  and messageContent != ''"> and message_content like concat('%', #{messageContent}, '%')</if>
+            <if test="params.beginTimeStamp != null and params.beginTimeStamp != '' and params.endTimeStamp != null and params.endTimeStamp != ''"> and time_stamp between #{params.beginTimeStamp} and #{params.endTimeStamp}</if>
+        </where>
+    </select>
+    
+    <select id="selectStdConsultationRecordByMessageId" parameterType="Long" resultMap="StdConsultationRecordResult">
+        <include refid="selectStdConsultationRecordVo"/>
+        where message_id = #{messageId}
+    </select>
+        
+    <insert id="insertStdConsultationRecord" parameterType="StdConsultationRecord">
+        insert into std_consultation_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="messageId != null">message_id,</if>
+            <if test="consultationId != null">consultation_id,</if>
+            <if test="messageSenderId != null">message_sender_id,</if>
+            <if test="messageContent != null">message_content,</if>
+            <if test="timeStamp != null">time_stamp,</if>
+            <if test="delFlag != null">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="messageId != null">#{messageId},</if>
+            <if test="consultationId != null">#{consultationId},</if>
+            <if test="messageSenderId != null">#{messageSenderId},</if>
+            <if test="messageContent != null">#{messageContent},</if>
+            <if test="timeStamp != null">#{timeStamp},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStdConsultationRecord" parameterType="StdConsultationRecord">
+        update std_consultation_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="consultationId != null">consultation_id = #{consultationId},</if>
+            <if test="messageSenderId != null">message_sender_id = #{messageSenderId},</if>
+            <if test="messageContent != null">message_content = #{messageContent},</if>
+            <if test="timeStamp != null">time_stamp = #{timeStamp},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where message_id = #{messageId}
+    </update>
+
+    <delete id="deleteStdConsultationRecordByMessageId" parameterType="Long">
+        delete from std_consultation_record where message_id = #{messageId}
+    </delete>
+
+    <delete id="deleteStdConsultationRecordByMessageIds" parameterType="String">
+        delete from std_consultation_record where message_id in 
+        <foreach item="messageId" collection="array" open="(" separator="," close=")">
+            #{messageId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,38 +1,27 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.core.domain.entity.StdTask;
-import com.ruoyi.system.mapper.StdUserTaskMapper;
+import com.ruoyi.system.domain.StdUserTask;
+import com.ruoyi.system.mapper.StdTaskMapper;
 import com.ruoyi.system.service.IStdTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public class StdTaskService implements IStdTaskService {
+@Service
+public class StdTaskServiceImpl implements IStdTaskService {
     @Autowired
-    private StdUserTaskMapper userTaskMapper;
+    private StdTaskMapper taskMapper;
 
     @Override
     public List<StdTask> selectTaskList(StdTask task) {
-        return null;
+        return taskMapper.selectTaskList(task);
     }
 
     @Override
-    public List<StdTask> selectTasksByUserId(Long userId) {
-        return null;
+    public List<StdTask> selectTaskListByUserIdAndTaskStatus(StdUserTask userTask) {
+        return taskMapper.selectTaskListByUserIdAndTaskStatus(userTask);
     }
 
-    @Override
-    public List<StdTask> selectTasksByUserIdAndTaskStatus(Long userId, int taskStatus) {
-        return null;
-    }
-
-    @Override
-    public int countTasksByUserId(Long userId) {
-        return userTaskMapper.countUserTaskByUserId(userId);
-    }
-
-    @Override
-    public int countTasksByUserIdAndTaskStatus(Long userId, int taskStatus) {
-        return userTaskMapper.countUserTaskByUserIdAndTaskStatus(userId, taskStatus);
-    }
 }

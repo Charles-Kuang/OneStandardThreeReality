@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StdTaskMapper">
+
+    <resultMap type="StdTask" id="StdTaskResult">
+        <id     property="taskId"       column="task_id"      />
+		<result property="taskName"     column="task_name"    />
+        <result property="taskContent"  column="task_content" />
+        <result property="taskStatus"   column="task_status"  />
+    </resultMap>
+
+	<sql id="selectTaskVo">
+        select t.task_id, t.task_name, t.task_content,
+            ut.task_status
+        from std_task t
+            left join std_user_task ut on ut.task_id = t.task_id
+            left join sys_user u on u.user_id = ut.user_id
+    </sql>
+
+	<select id="selectTaskList" parameterType="StdTask" resultMap="StdTaskResult">
+		<include refid="selectTaskVo"/>
+	</select>
+
+    <select id="selectTaskListByUserIdAndTaskStatus" parameterType="StdUserTask" resultMap="StdTaskResult">
+        <include refid="selectTaskVo"/>
+        where ut.user_id = #{userId}
+        <if test="taskStatus != null and taskStatus > 0">and ut.task_status = #{taskStatus}</if>
+    </select>
+</mapper> 

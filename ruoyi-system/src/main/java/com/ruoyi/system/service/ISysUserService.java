@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+
+import com.ruoyi.common.core.domain.entity.StdTask;
 import com.ruoyi.common.core.domain.entity.SysUser;
 
 /**
@@ -65,6 +67,8 @@ public interface ISysUserService
      * @return 结果
      */
     public String selectUserPostGroup(String userName);
+
+    public String selectUserTaskGroup(Long userId);
 
     /**
      * 校验用户名称是否唯一
@@ -203,4 +207,12 @@ public interface ISysUserService
      * @return 结果
      */
     public String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
+
+    public List<StdTask> selectTasksByUserId(Long userId);
+
+    public List<StdTask> selectTasksByUserIdAndTaskStatus(Long userId, int taskStatus);
+
+    public int countTasksByUserId(Long userId);
+
+    public int countTasksByUserIdAndTaskStatus(Long userId, int taskStatus);
 }
